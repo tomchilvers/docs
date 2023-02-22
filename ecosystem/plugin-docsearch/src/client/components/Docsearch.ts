@@ -7,8 +7,6 @@ import type { DocsearchOptions } from '../../shared/index.js'
 import { useDocsearchShim } from '../composables/index.js'
 
 declare const __DOCSEARCH_INJECT_STYLES__: boolean
-declare const __DOCSEARCH_OPTIONS__: DocsearchOptions
-const options = __DOCSEARCH_OPTIONS__
 
 if (__DOCSEARCH_INJECT_STYLES__) {
   import('@docsearch/css')
@@ -26,8 +24,7 @@ export const Docsearch = defineComponent({
     },
     options: {
       type: Object as PropType<DocsearchOptions>,
-      required: false,
-      default: () => options,
+      required: true,
     },
   },
 
@@ -36,8 +33,8 @@ export const Docsearch = defineComponent({
     const lang = usePageLang()
     const docsearchShim = useDocsearchShim()
 
-    // resolve docsearch options for current locale
-    const optionsLocale = computed(() => ({
+    // resolve docsearch props for current locale
+    const propsLocale = computed(() => ({
       ...props.options,
       ...props.options.locales?.[routeLocale.value],
     }))
@@ -46,7 +43,7 @@ export const Docsearch = defineComponent({
 
     const initialize = (): void => {
       const rawFacetFilters =
-        optionsLocale.value.searchParameters?.facetFilters ?? []
+        propsLocale.value.searchParameters?.facetFilters ?? []
       facetFilters.splice(
         0,
         facetFilters.length,
@@ -56,10 +53,10 @@ export const Docsearch = defineComponent({
       // @ts-expect-error: https://github.com/microsoft/TypeScript/issues/50690
       docsearch({
         ...docsearchShim,
-        ...optionsLocale.value,
+        ...propsLocale.value,
         container: `#${props.containerId}`,
         searchParameters: {
-          ...optionsLocale.value.searchParameters,
+          ...propsLocale.value.searchParameters,
           facetFilters,
         },
       })
@@ -70,7 +67,7 @@ export const Docsearch = defineComponent({
 
       // re-initialize if the options is changed
       watch(
-        [routeLocale, optionsLocale],
+        [routeLocale, propsLocale],
         (
           [curRouteLocale, curPropsLocale],
           [prevRouteLocale, prevPropsLocale]

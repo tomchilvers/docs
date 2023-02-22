@@ -1,6 +1,7 @@
 import { isPlainObject, isString } from '@vuepress/shared'
 import type { HeadConfig, VuepressSSRContext } from '@vuepress/shared'
 import { onMounted, provide, ref, useSSRContext, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import {
   updateHeadSymbol,
   usePageHead,
@@ -12,6 +13,7 @@ import type { UpdateHead } from './composables/index.js'
  * Auto update head and provide as global util
  */
 export const setupUpdateHead = (): void => {
+  const route = useRoute()
   const head = usePageHead()
   const lang = usePageLang()
 
@@ -62,7 +64,11 @@ export const setupUpdateHead = (): void => {
     loadHead()
     updateHead()
     watch(
-      () => head.value,
+      // when watching `head`, route hash changes will also trigger the watcher,
+      // causing unnecessary head updates
+      // so we watch `head` in dev mode to support hot-reload of `frontmatter.head`,
+      // and watch `route.path` in production mode to avoid extra updates
+      () => (__VUEPRESS_DEV__ ? head.value : route.path),
       () => updateHead()
     )
   })
