@@ -141,7 +141,9 @@
     "yaml": "^2.2.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
   },
   "repository": {
     "type": "git",
@@ -153,10 +155,4 @@
     "url": "https://github.com/tomchilvers/docs/issues"
   },
   "homepage": "https://github.com/tomchilvers/docs#readme"
-  {
-    "scripts": {
-      "docs:dev": "vuepress dev docs",
-      "docs:build": "vuepress build docs"
-    }
-  }
 }
